@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Valentine's Special 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700;800&family=Nunito:wght@600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="heartCanvas"></canvas>
+<div id="petalLayer"></div>
+<div class="background-animation" id="bgAnimation"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="container" id="mainContainer">
+
+    <div class="top-shimmer"></div>
+
+    <span class="corner-deco top-left">🌹</span>
+    <span class="corner-deco top-right">🌹</span>
+    <span class="corner-deco bot-left">✨</span>
+    <span class="corner-deco bot-right">✨</span>
+
+    <div class="emoji-row">💕 ✨ 💌 ✨ 💕</div>
+
+    <div class="photo-block">
+        <div class="photo-glow-ring"></div>
+        <div class="photo-inner">
+            <img src="WhatsApp Image 2026-02-13 at 10.18.57 PM.jpeg" id="userPhoto" alt="Our Photo">
+        </div>
+        <span class="photo-badge">💖</span>
+    </div>
+
+    <div class="media-container" id="mediaBox">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueW9idmZ4ZzB4bm93amZ4eHh4eHh4eHh4eHh4eHh4eHh4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif" id="catImg" alt="Initial Cat">
+        <div class="media-shine"></div>
+    </div>
+
+    <h1 id="headline">Will you be my Valentine Salina ?❤️😽</h1>
+    <p class="sub-headline" id="subLine">💌 &nbsp; a little question from the heart &nbsp; 💌</p>
+
+    <div class="divider">
+        <span class="div-line"></span>
+        <span class="div-hearts">❤️&thinsp;❤️&thinsp;❤️</span>
+        <span class="div-line"></span>
+    </div>
+
+    <div class="btn-wrapper">
+        <button id="yesBtn" onclick="onYes()">
+            <span class="btn-shine"></span>
+            Yes 💕
+        </button>
+        <button id="noBtn" onclick="onNo()">
+            <span class="btn-shine"></span>
+            No 🙈
+        </button>
+    </div>
+
+    <div class="card-footer">🌸 💖 🌸 💖 🌸</div>
+    <div class="bot-shimmer"></div>
+</div>
+
+<script>
+/* ═══════════════════════════
+   PARTICLE CANVAS
+═══════════════════════════ */
+const canvas = document.getElementById('heartCanvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const particles = [];
+const EMOJIS = ['❤️','💕','💖','💗','💓','🌹','✨','💫','🌸'];
+
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x     = Math.random() * canvas.width;
+        this.y     = canvas.height + 40;
+        this.size  = 10 + Math.random() * 20;
+        this.speed = 0.5 + Math.random() * 1.1;
+        this.drift = (Math.random() - 0.5) * 0.7;
+        this.alpha = 0;
+        this.emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        this.rot   = (Math.random() - 0.5) * 0.05;
+        this.angle = 0;
+        this.delay = Math.random() * 200;
+    }
+    update() {
+        if (this.delay > 0) { this.delay--; return; }
+        this.y     -= this.speed;
+        this.x     += this.drift;
+        this.angle += this.rot;
+        if (this.alpha < 0.9) this.alpha += 0.03;
+        if (this.y < canvas.height * 0.3) this.alpha -= 0.015;
+        if (this.alpha <= 0 || this.y < -40) this.reset();
+    }
+    draw() {
+        if (this.delay > 0 || this.alpha <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.font = `${this.size}px serif`;
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.fillText(this.emoji, -this.size / 2, this.size / 2);
+        ctx.restore();
+    }
+}
+for (let i = 0; i < 35; i++) particles.push(new Particle());
+
+function animateCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateCanvas);
+}
+animateCanvas();
+
+/* ═══════════════════════════
+   PETALS
+═══════════════════════════ */
+function spawnPetal() {
+    const p   = document.createElement('div');
+    p.className = 'petal';
+    const size = 7 + Math.random() * 9;
+    const dur  = 5 + Math.random() * 5;
+    p.style.cssText = `left:${Math.random()*110}vw;width:${size}px;height:${Math.round(size*.7)}px;animation-duration:${dur}s;opacity:${.4+Math.random()*.5};`;
+    document.getElementById('petalLayer').appendChild(p);
+    setTimeout(() => p.remove(), dur * 1000);
+}
+setInterval(spawnPetal, 380);
+
+/* ═══════════════════════════
+   BUBBLES
+═══════════════════════════ */
+function createBubbles(count = 22) {
+    const bg = document.getElementById('bgAnimation');
+    for (let i = 0; i < count; i++) {
+        const b    = document.createElement('div');
+        b.className = 'bubble';
+        const size = Math.random() * 32 + 8;
+        b.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}vw;animation-duration:${Math.random()*6+5}s;animation-delay:${Math.random()*8}s;`;
+        bg.appendChild(b);
+    }
+}
+createBubbles();
+
+/* ═══════════════════════════
+   CSS HEARTS
+═══════════════════════════ */
+function spawnCssHeart() {
+    const bg   = document.getElementById('bgAnimation');
+    const h    = document.createElement('div');
+    h.className = 'heart';
+    const size = 10 + Math.random() * 18;
+    h.style.cssText = `left:${Math.random()*100}vw;width:${size}px;height:${size}px;animation-duration:${Math.random()*5+3}s;`;
+    bg.appendChild(h);
+    setTimeout(() => h.remove(), 8000);
+}
+setInterval(spawnCssHeart, 1300);
+
+/* ═══════════════════════════
+   NO BUTTON
+═══════════════════════════ */
+let noClickCount = 0;
+
+const sadCatPics = [
+    "https://cdn.pixabay.com/photo/2017/02/20/18/03/cat-2083492_1280.jpg",
+    "https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_1280.jpg",
+    "https://cdn.pixabay.com/photo/2017/02/20/18/03/cat-2083492_1280.jpg",
+    "https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_1280.jpg"
+];
+
+const sadMessages = [
+    "Wait, think again!🤨",
+    "Are you really sure?🥹",
+    "You're breaking my heart! 💔",
+    "I'm gonna cry...😭",
+    "Please don't say No 😿"
+];
+
+const sadSubLines = [
+    "💔 come on, reconsider... 💔",
+    "😿 my heart is hurting... 😿",
+    "😭 tears are falling... 😭",
+    "🥀 don't do this... 🥀",
+    "💔 please... one last chance... 💔"
+];
+
+function onNo() {
+    noClickCount++;
+    const img    = document.getElementById('catImg');
+    const h1     = document.getElementById('headline');
+    const sub    = document.getElementById('subLine');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+
+    img.src = sadCatPics[Math.min(noClickCount - 1, sadCatPics.length - 1)];
+    img.style.objectFit = 'cover';
+    img.style.padding   = '0';
+
+    h1.innerText  = sadMessages[Math.min(noClickCount - 1, sadMessages.length - 1)];
+    sub.innerText = sadSubLines[Math.min(noClickCount - 1, sadSubLines.length - 1)];
+
+    /* Grow Yes */
+    const s = Math.min(1.15 + noClickCount * 0.32, 2.2);
+    yesBtn.style.transform = `scale(${s})`;
+    yesBtn.style.boxShadow = `0 0 ${16 + noClickCount*9}px rgba(255,77,109,.75),0 0 ${28 + noClickCount*14}px rgba(255,77,109,.4)`;
+
+    /* Shake card */
+    const card = document.getElementById('mainContainer');
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+
+    /* Run-away No after 3 clicks */
+    if (noClickCount >= 3) {
+        noBtn.style.position   = 'fixed';
+        noBtn.style.transition = 'left .12s, top .12s';
+        noBtn.style.zIndex     = '9999';
+        runAwayNoBtn();
+    }
+}
+
+function runAwayNoBtn() {
+    const noBtn = document.getElementById('noBtn');
+    const m     = 60;
+    const w     = window.innerWidth  - m * 2 - 110;
+    const h     = window.innerHeight - m * 2 - 55;
+    noBtn.style.left = (m + Math.random() * Math.max(w, 10)) + 'px';
+    noBtn.style.top  = (m + Math.random() * Math.max(h, 10)) + 'px';
+}
+
+/* Touch + mouse flee */
+document.addEventListener('DOMContentLoaded', () => {
+    const nb = document.getElementById('noBtn');
+    nb.addEventListener('mousemove',  () => { if (noClickCount >= 3) runAwayNoBtn(); });
+    nb.addEventListener('touchstart', (e) => { if (noClickCount >= 3) { e.preventDefault(); runAwayNoBtn(); } }, { passive: false });
+});
+
+/* ═══════════════════════════
+   YES BUTTON
+═══════════════════════════ */
+const happyCat = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHRyeXpzeXZ4ZzB4bm93amZ4eHh4eHh4eHh4eHh4eHh4eHh4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KztT2c4u8mYYUiMKdJ/giphy.gif";
+
+function onYes() {
+    const container = document.getElementById('mainContainer');
+    container.style.animation = 'none';
+
+    container.innerHTML = `
+        <div class="top-shimmer"></div>
+        <span class="corner-deco top-left">🎊</span>
+        <span class="corner-deco top-right">🎊</span>
+        <span class="corner-deco bot-left">🎉</span>
+        <span class="corner-deco bot-right">🎉</span>
+
+        <div class="emoji-row" style="padding-top:14px;">🎊 💖 🎀 💖 🎊</div>
+
+        <div class="photo-block" style="margin-bottom:12px;">
+            <div class="photo-glow-ring"></div>
+            <div class="photo-inner">
+                <img src="WhatsApp Image 2026-02-13 at 10.25.48 PM.jpeg"
+                     style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;"
+                     alt="Happy Us">
+            </div>
+            <span class="photo-badge">🥳</span>
+        </div>
+
+        <div class="media-container" style="margin-bottom:14px;display:flex;align-items:center;justify-content:center;">
+            <img src="${happyCat}"
+                 style="width:100%;height:100%;object-fit:contain;padding:4px;display:block;"
+                 alt="Happy Cat">
+            <div class="media-shine"></div>
+        </div>
+
+        <h1 style="color:#c9184a;">I love You ❤️<br>Love You Forever😘</h1>
+        <p class="sub-headline" style="color:#a0405a;">
+            💌 &nbsp; I knew you'd say yes! salu babe ❤️🌹😘 &nbsp; 💌
+        </p>
+
+        <div class="divider">
+            <span class="div-line"></span>
+            <span class="div-hearts">❤️&thinsp;❤️&thinsp;❤️</span>
+            <span class="div-line"></span>
+        </div>
+
+        <div class="card-footer">🌹 💖 🎀 💖 🌹</div>
+        <div class="bot-shimmer"></div>
+    `;
+
+    document.body.style.background = 'radial-gradient(ellipse at 30% 40%, #ffccd5 0%, #ffafbd 50%, #ff85a1 100%)';
+    burstCelebration();
+}
+
+function burstCelebration() {
+    for (let i = 0; i < 18; i++) particles.push(new Particle());
+
+    const colors = ['#ff4d6d','#f9c74f','#ffb3c1','#90e0ef','#c77dff','#80ffdb','#ff758c'];
+    for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+            const c  = document.createElement('div');
+            const sz = 5 + Math.random() * 8;
+            c.style.cssText = `
+                position:fixed;z-index:999;
+                left:${Math.random()*100}vw;top:-${sz}px;
+                width:${sz}px;height:${sz}px;
+                background:${colors[Math.floor(Math.random()*colors.length)]};
+                border-radius:${Math.random()>.5?'50%':'2px'};
+                animation:confettiFall ${1.4+Math.random()*2}s ease-in forwards;
+                pointer-events:none;
+            `;
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3600);
+        }, i * 35);
+    }
+}
+</script>
+</body>
+</html>
